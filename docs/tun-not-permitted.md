@@ -21,7 +21,7 @@ version: "3"
 
 services:
   warp:
-    image: caomingjun/warp
+    image: ghcr.io/owner/mc-warp-docker:latest
     container_name: warp
     restart: always
     # ===== Add the following 2 lines =====
@@ -29,9 +29,10 @@ services:
       - 'c 10:200 rwm'
     # ================ End ================
     ports:
-      - "1080:1080"
+      - "8080:8080"
     environment:
       - WARP_SLEEP=2
+      - MC_SERVER_HOST=mc.hypixel.net
       # - WARP_LICENSE_KEY= # optional
     cap_add:
       # Docker already have them, these are for podman users
@@ -49,7 +50,7 @@ services:
 ## Previous Solution
 
 > [!NOTE]
-> This is a previous (later reverted) solution, which used in image [`fc0c8c6`](https://hub.docker.com/layers/caomingjun/warp/2024.11.309.0-2.12.0-fc0c8c625dc421bbe29c235c79bea18d07be2510/images/sha256-e0aef1a4dde98926a398b0028b8feebd56c7070e7fbb262c7c947843c30e5dc7), [`1f75fb6`](https://hub.docker.com/layers/caomingjun/warp/2024.11.309.0-2.12.0-1f75fb6b6b15bdefda72dfbf1a2b43c19c776bd2/images/sha256-339f4c31197de6424f6c02e59911e5ebd39d5110e37d10dfcf7f553ada95a352) and [`1dab548`](https://hub.docker.com/layers/caomingjun/warp/2024.11.309.0-2.12.0-1dab548db478e27d68506c181d374e3bd02193e5/images/sha256-cabe746469889f16c60d9a77fcb7482c68863865160038882ce0fe8be41868e3). Although it solved the problem on most devices, it caused issues on some devices. We have reverted this change.
+> This is a previous (later reverted) solution. Although it solved the problem on most devices, it caused issues on some devices. We have reverted this change.
 
 > [!WARNING]
 > This section is only for recording the solution for possible future needs; please **do NOT follow this solution**!
@@ -63,7 +64,7 @@ version: "3"
 
 services:
   warp:
-    image: caomingjun/warp
+    image: ghcr.io/owner/mc-warp-docker:latest
     container_name: warp
     restart: always
     # ===== Add the following 2 lines =====
@@ -71,9 +72,10 @@ services:
       - /dev/net/tun:/dev/net/tun
     # ================ End ================
     ports:
-      - "1080:1080"
+      - "8080:8080"
     environment:
       - WARP_SLEEP=2
+      - MC_SERVER_HOST=mc.hypixel.net
       # - WARP_LICENSE_KEY= # optional
     cap_add:
       # Docker already have them, these are for podman users

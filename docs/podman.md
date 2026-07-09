@@ -8,14 +8,15 @@
 podman run -d \
   --name warp \
   --restart always \
-  -p 1080:1080 \
+  -p 8080:8080 \
   -e WARP_SLEEP=2 \
+  -e MC_SERVER_HOST=mc.hypixel.net \
   --cap-add=NET_ADMIN \
   --device=/dev/net/tun \
   --sysctl net.ipv6.conf.all.disable_ipv6=0 \
   --sysctl net.ipv4.conf.all.src_valid_mark=1 \
   -v ./data:/var/lib/cloudflare-warp \
-  docker.io/caomingjun/warp:latest
+  ghcr.io/owner/mc-warp-docker:latest
 ```
 
 > [!NOTE]

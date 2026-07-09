@@ -70,15 +70,16 @@ version: "3"
 
 services:
   warp:
-    image: caomingjun/warp
+    image: ghcr.io/owner/mc-warp-docker:latest
     container_name: warp
     restart: always
     device_cgroup_rules:
       - 'c 10:200 rwm'
     ports:
-      - "1080:1080"
+      - "8080:8080"
     environment:
       - WARP_SLEEP=2
+      - MC_SERVER_HOST=mc.hypixel.net
       - WARP_ENABLE_NAT=1 # enable nat
     cap_add:
       - MKNOD

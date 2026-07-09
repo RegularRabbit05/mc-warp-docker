@@ -1,13 +1,9 @@
 # warp-docker
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/caomingjun/warp)](https://hub.docker.com/r/caomingjun/warp)
-![WARP version in latest image](https://img.shields.io/endpoint?url=https%3A%2F%2Fapi.caomingjun.com%2Fdockerhub-label%3Frepo%3Dcaomingjun%2Fwarp%26label%3DWARP_VERSION%26display%3DWARP%2520in%2520image)
-![GOST version in latest image](https://img.shields.io/endpoint?url=https%3A%2F%2Fapi.caomingjun.com%2Fdockerhub-label%3Frepo%3Dcaomingjun%2Fwarp%26label%3DGOST_VERSION%26display%3DGOST%2520in%2520image)
-
-Run official [Cloudflare WARP](https://1.1.1.1/) client in Docker.
+Run the official [Cloudflare WARP](https://1.1.1.1/) client in Docker and forward Minecraft TCP traffic through it.
 
 > [!NOTE]
-> Cannot guarantee that the [GOST](https://github.com/ginuerzh/gost) and WARP client contained in the image are the latest versions. If necessary, please [build your own image](#build).
+> Cannot guarantee that the WARP client contained in the image is the latest version. If necessary, please [build your own image](#build).
 
 ## Usage
 
@@ -20,16 +16,17 @@ version: "3"
 
 services:
   warp:
-    image: caomingjun/warp
+    image: ghcr.io/owner/mc-warp-docker:latest
     container_name: warp
     restart: always
     # add removed rule back (https://github.com/opencontainers/runc/pull/3468)
     device_cgroup_rules:
       - 'c 10:200 rwm'
     ports:
-      - "1080:1080"
+      - "8080:8080"
     environment:
       - WARP_SLEEP=2
+      - MC_SERVER_HOST=mc.hypixel.net
       # - WARP_LICENSE_KEY= # optional
       # - WARP_ENABLE_NAT=1 # enable nat
     cap_add:
@@ -52,10 +49,10 @@ services:
 Try it out to see if it works:
 
 ```bash
-curl --socks5-hostname 127.0.0.1:1080 https://cloudflare.com/cdn-cgi/trace
+nc -vz 127.0.0.1 8080
 ```
 
-If the output contains `warp=on` or `warp=plus`, the container is working properly. If the output contains `warp=off`, it means that the container failed to connect to the WARP service.
+If the TCP connection succeeds, the container is listening and forwarding traffic to the configured Minecraft server through WARP.
 
 ### Configuration
 
@@ -63,7 +60,7 @@ You can configure the container through the following environment variables:
 
 - `WARP_SLEEP`: The time to wait for the WARP daemon to start, in seconds. The default is 2 seconds. If the time is too short, it may cause the WARP daemon to not start before using the proxy, resulting in the proxy not working properly. If the time is too long, it may cause the container to take too long to start. If your server has poor performance, you can increase this value appropriately.
 - `WARP_LICENSE_KEY`: The license key of the WARP client, which is optional. If you have subscribed to WARP+ service, you can fill in the key in this environment variable. If you have not subscribed to WARP+ service, you can ignore this environment variable.
-- `GOST_ARGS`: The arguments passed to GOST. The default is `-L :1080`, which means to listen on port 1080 in the container at the same time through HTTP and SOCKS5 protocols. If you want to have UDP support or use advanced features provided by other protocols, you can modify this parameter. For more information, refer to [GOST documentation](https://v2.gost.run/en/). If you modify the port number, you may also need to modify the port mapping in the `docker-compose.yml`.
+- `MC_SERVER_HOST`: The Minecraft server hostname to forward to. The default is `mc.hypixel.net`. The container listens on TCP port 8080 and forwards to `${MC_SERVER_HOST}:25565`.
 - `REGISTER_WHEN_MDM_EXISTS`: If set, will register consumer account (WARP or WARP+, in contrast to Zero Trust) even when `mdm.xml` exists. You usually don't need this, as `mdm.xml` are usually used for Zero Trust. However, some users may want to adjust advanced settings in `mdm.xml` while still using consumer account.
 - `BETA_FIX_HOST_CONNECTIVITY`: If set, will add checks for host connectivity into healthchecks and automatically fix it if necessary. See [host connectivity issue](docs/host-connectivity.md) for more information.
 - `WARP_ENABLE_NAT`: If set, will work as warp mode and turn NAT on. You can route L3 traffic through `warp-docker` to Warp. See [nat gateway](docs/nat-gateway.md) for more information.
@@ -72,53 +69,26 @@ Data persistence: Use the host volume `./data` to persist the data of the WARP c
 
 For advanced usage or configurations, see [documentation](docs/README.md).
 
-### Use other versions
+### Image
 
-The tag of docker image is in the format of `{WARP_VERSION}-{GOST_VERSION}`, for example, `2023.10.120-2.11.5` means that the WARP client version is `2023.10.120` and the GOST version is `2.11.5`. If you want to use other versions, you can specify the tag in the `docker-compose.yml`.
-
-You can also use the `latest` tag to use the latest version of the image.
-
-> [!NOTE]
-> You can access the image built by a certain commit by using the tag `{WARP_VERSION}-{GOST_VERSION}-{COMMIT_SHA}`. Not all commits have images built.
-
-> [!NOTE]
-> Not all version combinations are available. Do check [the list of tags in Docker Hub](https://hub.docker.com/r/caomingjun/warp/tags) before you use one. If the version you want is not available, you can [build your own image](#build).
-
-#### EXPERIMENTAL: Debian slim variant
-
-This repository now publishes an additional set of images based on Debian image `debian:bookworm-slim`. These images have the `slim-` prefix in their tags:
-
-- `slim-latest`
-- `slim-{WARP_VERSION}-{GOST_VERSION}`
-- `slim-{WARP_VERSION}-{GOST_VERSION}-{COMMIT_SHA}`
-
-The slim variants use a smaller base image (`debian:bookworm-slim`) to reduce image size and memory usage. However, tests are still ongoing to ensure that all functionalities work as expected. Use these images at your own risk. If you encounter any issues, please report them in the [issue #67](https://github.com/cmj2002/warp-docker/issues/67).
+The image is published to GitHub Container Registry as `ghcr.io/<owner>/<repository>:latest`. Replace `owner` in the examples with your GitHub organization or username.
 
 ## Build
 
 You can use Github Actions to build the image yourself.
 
 1. Fork this repository.
-2. Create necessary variables and secrets in the repository settings:
-   1. variable `REGISTRY`: for example, `docker.io` (Docker Hub)
-   2. variable `IMAGE_NAME`: for example, `caomingjun/warp`
-   3. variable `DOCKER_USERNAME`: for example, `caomingjun`
-   4. secret `DOCKER_PASSWORD`: generate a token in Docker Hub and fill in the token
-3. Manually trigger the workflow `Build and push image` in the Actions tab.
+2. Push to any branch to trigger the workflow.
 
-This will build the image with the latest version of WARP client and GOST and push it to the specified registry. You can also specify the version of GOST by giving input to the workflow. Building image with custom WARP client version is not supported yet.
+This will build `linux/amd64` and `linux/arm64` images using `debian:bookworm-slim`, push architecture-specific tags to GitHub Container Registry, and publish a multi-arch `latest` manifest.
 
 If you want to build the image locally, you can use [`.github/workflows/build-publish.yml`](.github/workflows/build-publish.yml) as a reference.
 
 ## Common problems
 
-### Proxying UDP or even ICMP traffic
-
-The default `GOST_ARGS` is `-L :1080`, which provides HTTP and SOCKS5 proxy. If you want to proxy UDP or even ICMP traffic, you need to change the `GOST_ARGS`. Read the [GOST documentation](https://v2.gost.run/en/) for more information. If you modify the port number, you may also need to modify the port mapping in the `docker-compose.yml`.
-
 ### How to connect from another container
 
-You may want to use the proxy from another container and find that you cannot connect to `127.0.0.1:1080` in that container. This is because the `docker-compose.yml` only maps the port to the host, not to other containers. To solve this problem, you can use the service name as the hostname, for example, `warp:1080`. You also need to put the two containers in the same docker network.
+You may want to use the forwarder from another container and find that you cannot connect to `127.0.0.1:8080` in that container. This is because the `docker-compose.yml` only maps the port to the host, not to other containers. To solve this problem, you can use the service name as the hostname, for example, `warp:8080`. You also need to put the two containers in the same docker network.
 
 ### "Operation not permitted" when open tun
 
@@ -138,7 +108,7 @@ References that might help:
 
 ### Container runs well but cannot connect from host
 
-This issue often arises when using Zero Trust. You may find that you can run `curl --socks5-hostname 127.0.0.1:1080 https://cloudflare.com/cdn-cgi/trace` inside the container, but cannot run this command outside the container (from host or another container). This is because Cloudflare WARP client is grabbing the traffic. See [host connectivity issue](docs/host-connectivity.md) for solutions.
+This issue often arises when using Zero Trust. You may find that the Minecraft forwarder works inside the container, but cannot connect to `127.0.0.1:8080` outside the container (from host or another container). This is because Cloudflare WARP client is grabbing the traffic. See [host connectivity issue](docs/host-connectivity.md) for solutions.
 
 ### How to enable MASQUE / use with Zero Trust / set up WARP Connector / change health check parameters
 

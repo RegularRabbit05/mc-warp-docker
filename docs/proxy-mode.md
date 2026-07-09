@@ -18,13 +18,11 @@ Create a new healthcheck script `new-healthcheck.sh` with content:
 ```bash
 #!/bin/bash
 
-curl -fsS --socks5-hostname 127.0.0.1:1080 "https://cloudflare.com/cdn-cgi/trace" | grep -qE "warp=(plus|on)" || exit 1
+curl -fsS --socks5-hostname 127.0.0.1:40000 "https://cloudflare.com/cdn-cgi/trace" | grep -qE "warp=(plus|on)" || exit 1
 exit 0
 ```
 
-Update the `docker-compose.yml` file:
-1. set env `GOST_ARGS` to `-L :1080 -F=127.0.0.1:40000`
-2. mount new healthcheck to `/healthcheck/connected-to-warp.sh`:
+Update the `docker-compose.yml` file to mount new healthcheck to `/healthcheck/connected-to-warp.sh`:
 
 For example, the default `docker-compose.yml` file will be changed to:
 
@@ -33,17 +31,17 @@ version: "3"
 
 services:
   warp:
-    image: caomingjun/warp
+    image: ghcr.io/owner/mc-warp-docker:latest
     container_name: warp
     restart: always
     # add removed rule back (https://github.com/opencontainers/runc/pull/3468)
     device_cgroup_rules:
       - 'c 10:200 rwm'
     ports:
-      - "1080:1080"
+      - "8080:8080"
     environment:
       - WARP_SLEEP=2
-      - GOST_ARGS=-L :1080 -F=127.0.0.1:40000
+      - MC_SERVER_HOST=mc.hypixel.net
       # - WARP_LICENSE_KEY= # optional
     cap_add:
       # Docker already have them, these are for podman users

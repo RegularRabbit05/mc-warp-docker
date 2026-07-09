@@ -19,16 +19,17 @@ Sample Docker Compose File:
 ```yaml
 services:
   warp:
-    image: caomingjun/warp
+    image: ghcr.io/owner/mc-warp-docker:latest
     container_name: warp
     restart: always
     # add removed rule back (https://github.com/opencontainers/runc/pull/3468)
     device_cgroup_rules:
       - 'c 10:200 rwm'
     ports:
-      - "1080:1080"
+      - "8080:8080"
     environment:
       - WARP_SLEEP=2
+      - MC_SERVER_HOST=mc.hypixel.net
     cap_add:
       - NET_ADMIN
     sysctls:

@@ -75,5 +75,5 @@ if [ -n "$WARP_ENABLE_NAT" ]; then
     sudo nft add rule ip6 mangle forward tcp flags syn tcp option maxseg size set rt mtu
 fi
 
-# start the proxy
-gost $GOST_ARGS
+# start the TCP forwarder
+exec socat -d -d TCP-LISTEN:8080,bind=0.0.0.0,fork,reuseaddr TCP:"$MC_SERVER_HOST":25565

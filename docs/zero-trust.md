@@ -11,6 +11,6 @@ If you want to use the WARP client with Cloudflare Zero Trust, just start the co
 7. In the terminal, run the following command using the URL obtained in the previous step: `warp-cli registration token com.cloudflare.warp://<your-team-name>.cloudflareaccess.com/auth?token=<your-token>`. If you get an API error, then the token has expired. Generate a new one by refreshing the web page and quickly grab the new token from the page source.
 8. `warp-cli connect` to reconnect using new registration.
 9. Wait untill `warp-cli status` shows `Connected`.
-10. Try `curl --socks5-hostname 127.0.0.1:1080 https://cloudflare.com/cdn-cgi/trace` to verify the connection.
+10. Try `nc -vz 127.0.0.1 8080` to verify that the Minecraft forwarder is reachable.
 
 This is only needed for the first time. After the device is enrolled, the registration information will be stored in the `./data` directory, if you don't delete them, the container will automatically use the registration information to connect to the WARP service after restart or recreate.
