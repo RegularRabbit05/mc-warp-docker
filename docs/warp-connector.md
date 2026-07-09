@@ -29,7 +29,7 @@ services:
       - "8080:8080"
     environment:
       - WARP_SLEEP=2
-      - MC_SERVER_HOST=mc.hypixel.net
+      - MC_SERVER_HOST=mc.example.com
     cap_add:
       - NET_ADMIN
     sysctls:

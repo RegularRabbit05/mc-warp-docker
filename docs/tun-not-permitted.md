@@ -32,7 +32,7 @@ services:
       - "8080:8080"
     environment:
       - WARP_SLEEP=2
-      - MC_SERVER_HOST=mc.hypixel.net
+      - MC_SERVER_HOST=mc.example.com
       # - WARP_LICENSE_KEY= # optional
     cap_add:
       # Docker already have them, these are for podman users
@@ -75,7 +75,7 @@ services:
       - "8080:8080"
     environment:
       - WARP_SLEEP=2
-      - MC_SERVER_HOST=mc.hypixel.net
+      - MC_SERVER_HOST=mc.example.com
       # - WARP_LICENSE_KEY= # optional
     cap_add:
       # Docker already have them, these are for podman users

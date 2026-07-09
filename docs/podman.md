@@ -10,7 +10,7 @@ podman run -d \
   --restart always \
   -p 8080:8080 \
   -e WARP_SLEEP=2 \
-  -e MC_SERVER_HOST=mc.hypixel.net \
+  -e MC_SERVER_HOST=mc.example.com \
   --cap-add=NET_ADMIN \
   --device=/dev/net/tun \
   --sysctl net.ipv6.conf.all.disable_ipv6=0 \

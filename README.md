@@ -26,7 +26,7 @@ services:
       - "8080:8080"
     environment:
       - WARP_SLEEP=2
-      - MC_SERVER_HOST=mc.hypixel.net
+      - MC_SERVER_HOST=mc.example.com
       # - WARP_LICENSE_KEY= # optional
       # - WARP_ENABLE_NAT=1 # enable nat
     cap_add:
@@ -60,7 +60,7 @@ You can configure the container through the following environment variables:
 
 - `WARP_SLEEP`: The time to wait for the WARP daemon to start, in seconds. The default is 2 seconds. If the time is too short, it may cause the WARP daemon to not start before using the proxy, resulting in the proxy not working properly. If the time is too long, it may cause the container to take too long to start. If your server has poor performance, you can increase this value appropriately.
 - `WARP_LICENSE_KEY`: The license key of the WARP client, which is optional. If you have subscribed to WARP+ service, you can fill in the key in this environment variable. If you have not subscribed to WARP+ service, you can ignore this environment variable.
-- `MC_SERVER_HOST`: The Minecraft server hostname to forward to. The default is `mc.hypixel.net`. The container listens on TCP port 8080 and forwards to `${MC_SERVER_HOST}:25565`.
+- `MC_SERVER_HOST`: The Minecraft server hostname to forward to. The default is `mc.example.com`. The container listens on TCP port 8080 and forwards to `${MC_SERVER_HOST}:25565`.
 - `REGISTER_WHEN_MDM_EXISTS`: If set, will register consumer account (WARP or WARP+, in contrast to Zero Trust) even when `mdm.xml` exists. You usually don't need this, as `mdm.xml` are usually used for Zero Trust. However, some users may want to adjust advanced settings in `mdm.xml` while still using consumer account.
 - `BETA_FIX_HOST_CONNECTIVITY`: If set, will add checks for host connectivity into healthchecks and automatically fix it if necessary. See [host connectivity issue](docs/host-connectivity.md) for more information.
 - `WARP_ENABLE_NAT`: If set, will work as warp mode and turn NAT on. You can route L3 traffic through `warp-docker` to Warp. See [nat gateway](docs/nat-gateway.md) for more information.

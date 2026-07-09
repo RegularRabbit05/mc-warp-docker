@@ -79,7 +79,7 @@ services:
       - "8080:8080"
     environment:
       - WARP_SLEEP=2
-      - MC_SERVER_HOST=mc.hypixel.net
+      - MC_SERVER_HOST=mc.example.com
       - WARP_ENABLE_NAT=1 # enable nat
     cap_add:
       - MKNOD
